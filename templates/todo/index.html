@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center">
+    <h1>
+      Todo List
+    </h1>
+    <a href="{% url 'todo:task-create' %}" class="btn btn-primary">Add New Task</a>
+  </div>
+
+  {% if task_list %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <tbody>
+          {% for task in task_list %}
+            <hr>
+            <tr>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ task.content }}</strong>
+                  {% if task.is_completed %}
+                    <span class="text-success fw-bolder">
+                      Done
+                    </span>
+                  {% else %}
+                    <span class="text-danger fw-bolder">
+                      Not done
+                    </span>
+                  {% endif %}
+                </div>
+
+                {% if task.is_completed %}
+                  <form action="" method="post">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="pk" value="{{ task.id }}">
+                    <input type="submit" class="btn btn-secondary" value="Undo">
+                  </form>
+                {% else %}
+                  <form action="" method="post">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="pk" value="{{ task.id }}">
+                    <input type="submit" class="btn btn-success" value="Complete">
+                  </form>
+                {% endif %}
+              </div>
+              <p>
+                Created: {{ task.created_at }}
+                {% if task.deadline %}
+                  <span class="text-danger">Deadline: {{ task.deadline }}</span>
+                {% endif %}
+              </p>
+              <p>
+                <span class="text-muted">Tags:</span>
+                {% for tag in task.tags.all %}
+                  <span class="text-muted">{{ tag.name }}</span>
+                {% endfor %}
+                <a href="{% url 'todo:task-update' pk=task.id %}" class="text-info fw-bolder">Update</a>
+                <a href="{% url 'todo:task-delete' pk=task.id %}" class="text-danger fw-bolder">Delete</a>
+              </p>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>There are no tasks in todo list.</p>
+  {% endif %}
+{% endblock %}
